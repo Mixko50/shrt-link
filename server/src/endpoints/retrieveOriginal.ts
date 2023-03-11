@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import { ShrtRepository } from "../repository/shrt";
 import { RetrieveUrlRequest } from "../types/request";
-import { ShrtResponse } from "../types/response";
+import { BasedResponseElysia } from "../types/response";
 
 export const retrieveOriginalUrl = (app: Elysia) => app
     .post("/retrieve", async ({ body: { shrt_url }, set }) => {
@@ -25,7 +25,7 @@ export const retrieveOriginalUrl = (app: Elysia) => app
             set.status = 400
             return {
                 success: true,
-                data: {
+                error: {
                     error_message: "URL Not found"
                 }
             }
@@ -34,16 +34,16 @@ export const retrieveOriginalUrl = (app: Elysia) => app
     }, {
         schema: {
             body: RetrieveUrlRequest,
-            response: ShrtResponse
+            response: BasedResponseElysia
         }
-    }).onError(({ code, error, set }) => {
+    }).onError(({ code, set }) => {
         if (code == 'VALIDATION') {
             set.status = 400
             return {
                 success: false,
-                data: {
-                    error_message: error.message,
-                    detail: "The url is invalid"
+                error: {
+                    error_message: "Validation failed",
+                    detail: "The url is invalid",
                 }
             }
         }

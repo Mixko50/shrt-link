@@ -8,6 +8,8 @@ specifiers:
   autoprefixer: ^10.4.13
   eslint: ^8.35.0
   postcss: ^8.4.21
+  prettier: ^2.8.4
+  prettier-plugin-tailwindcss: ^0.1.13
   solid-headless: ^0.13.1
   solid-js: ^1.6.11
   solid-start: ^0.2.23
@@ -23,6 +25,8 @@ dependencies:
   '@typescript-eslint/eslint-plugin': 5.54.1_mlk7dnz565t663n4razh6a6v6i
   '@typescript-eslint/parser': 5.54.1_ycpbpc6yetojsgtrx3mwntkhsu
   eslint: 8.35.0
+  prettier: 2.8.4
+  prettier-plugin-tailwindcss: 0.1.13_prettier@2.8.4
   solid-headless: 0.13.1_solid-js@1.6.13
   solid-js: 1.6.13
   solid-start: 0.2.23_rkkq6zg7qgu7px5m73pb6mgk6q
@@ -3184,6 +3188,21 @@ packages:
   /prelude-ls/1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
+    dev: false
+
+  /prettier-plugin-tailwindcss/0.1.13_prettier@2.8.4:
+    resolution: {integrity: sha512-/EKQURUrxLu66CMUg4+1LwGdxnz8of7IDvrSLqEtDqhLH61SAlNNUSr90UTvZaemujgl3OH/VHg+fyGltrNixw==}
+    engines: {node: '>=12.17.0'}
+    peerDependencies:
+      prettier: '>=2.2.0'
+    dependencies:
+      prettier: 2.8.4
+    dev: false
+
+  /prettier/2.8.4:
+    resolution: {integrity: sha512-vIS4Rlc2FNh0BySk3Wkd6xmwxB0FpOndW5fisM5H8hsZSxU2VWVB5CWIkIjWvrHjIhxk2g3bfMKM87zNTrZddw==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
     dev: false
 
   /punycode/2.3.0:

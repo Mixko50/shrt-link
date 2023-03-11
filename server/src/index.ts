@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
-import { errorHandling } from './errors/errorHandling'
+import { corsConfig } from './elysia/cors'
+import { errorHandling } from './elysia/errorHandling'
 import { connectDatabase } from './repository/connect'
 import { route } from './routes/apiRoute'
 
@@ -12,6 +13,7 @@ await connectDatabase()
 
 // Elysia
 const app = new Elysia()
+    .use(corsConfig)
     .use(errorHandling)
     .use(route)
     .listen(process.env.PORT ?? 8080)

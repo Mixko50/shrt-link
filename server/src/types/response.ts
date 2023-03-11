@@ -12,15 +12,6 @@ export const ShrtResponseElysia = t.Object({
 
 export const BasedResponseElysia = t.Object({
     success: t.Boolean(),
-    data: ShrtResponseElysia
-})
-
-export const ShrtResponse = t.Object({
-    success: t.Boolean(),
-    data: t.Object({
-        long_url: t.Optional(t.String()),
-        slug: t.Optional(t.String()),
-        error_message: t.Optional(t.String()),
-        detail: t.Optional(t.String())
-    })
+    data: t.Optional(ShrtResponseElysia),
+    error: t.Optional(ErrorResponseElysia)
 })

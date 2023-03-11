@@ -51,13 +51,13 @@ export const createShortenUrlController = (app: Elysia) => app
             body: UrlRequest,
             response: BasedResponseElysia
         }
-    }).onError(({ code, error, set }) => {
+    }).onError(({ code, set }) => {
         if (code == 'VALIDATION') {
             set.status = 400
             return {
                 success: false,
-                data: {
-                    error_message: error.message,
+                error: {
+                    error_message: "Validation failed",
                     detail: "The url is invalid"
                 }
             }

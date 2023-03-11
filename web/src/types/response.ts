@@ -1,14 +1,15 @@
-export interface BasedResponse<T> {
-    success: boolean
-    data: T
+export interface BasedResponse {
+	success: boolean;
+	data: ShrtResponse;
+	error: ErrorResponse;
 }
 
 export interface ShrtResponse {
-    long_url: string
-    slug: string
+	long_url: string;
+	slug: string;
 }
 
 export interface ErrorResponse {
-    error_message: string
-    detail: string
+	error_message: string;
+	detail: string;
 }
