@@ -3,6 +3,6 @@ import Elysia from "elysia";
 
 export const corsConfig = (app: Elysia) => app
     .use(cors({
-        origin: /\*.mixkomii.com$/,
+        origin: '*',
         methods: ['GET', 'POST']
     }))

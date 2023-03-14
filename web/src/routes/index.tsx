@@ -260,9 +260,7 @@ const Home = () => {
 									<Match when={!response()?.success}>
 										<div class="mt-2 flex flex-col">
 											<p class="text-lg font-medium"></p>
-											<p class="text-lg">
-												{response()?.error.detail ?? null}
-											</p>
+											<p class="text-lg">{response()?.error?.detail ?? ''}</p>
 										</div>
 									</Match>
 								</Switch>
