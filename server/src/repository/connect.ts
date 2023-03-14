@@ -4,7 +4,14 @@ import { Shrt } from "../models/shrtTable";
 export const connectDatabase = async () => {
     let Db: Sequelize
     if (process.env.DATABASE_URL) {
-        Db = new Sequelize(process.env.DATABASE_URL)
+        Db = new Sequelize(process.env.DATABASE_URL, {
+            pool: {
+                max: 5,
+                min: 0,
+                acquire: 30000,
+                idle: 10000
+            }
+        })
     } else {
         throw Error("Could't connect to the database")
     }

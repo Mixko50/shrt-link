@@ -10,6 +10,7 @@ import {
 import { BasedResponse } from '~/types/response';
 import { RetrieveRequest, ShrtRequest } from '~/types/request';
 import { A } from 'solid-start';
+import LoadingIndicator from '~/components/LoadingIndicator';
 
 const Home = () => {
 	const [slug, setSlug] = createSignal<string>('');
@@ -18,6 +19,7 @@ const Home = () => {
 	const [response, setResponse] = createSignal<BasedResponse>();
 
 	const [isOpen, setIsOpen] = createSignal(false);
+	const [isFetching, setIsFecthing] = createSignal<boolean>(false);
 
 	const closeModal = () => {
 		setIsOpen(false);
@@ -28,6 +30,7 @@ const Home = () => {
 	};
 
 	const createShortUrl = async () => {
+		setIsFecthing(true);
 		const req: ShrtRequest = {
 			full_url: url(),
 			slug: slug()
@@ -42,10 +45,12 @@ const Home = () => {
 			.then((data) => {
 				setResponse(data);
 				openModal();
+				setIsFecthing(false);
 			});
 	};
 
 	const retrieveOriginalUrl = () => {
+		setIsFecthing(true);
 		const req: RetrieveRequest = {
 			shrt_url: url()
 		};
@@ -59,6 +64,7 @@ const Home = () => {
 			.then((data) => {
 				setResponse(data);
 				openModal();
+				setIsFecthing(false);
 			});
 	};
 
@@ -133,20 +139,27 @@ const Home = () => {
 										</div>
 									</div>
 									<div class="space-x-2 pb-5">
-										<button
-											type="submit"
-											class="h-10 rounded-md bg-[#E96479] py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-[#C3ACD0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-											onClick={createShortUrl}
-										>
-											Get shorten url
-										</button>
-										<button
-											type="submit"
-											class="h-10 rounded-md bg-[#7286D3] py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-[#C3ACD0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[indigo-500]"
-											onClick={retrieveOriginalUrl}
-										>
-											Retrieve original url
-										</button>
+										<Switch>
+											<Match when={isFetching()}>
+												<LoadingIndicator />
+											</Match>
+											<Match when={!isFetching()}>
+												<button
+													type="submit"
+													class="h-10 rounded-md bg-[#E96479] py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-[#C3ACD0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+													onClick={createShortUrl}
+												>
+													Get shorten url
+												</button>
+												<button
+													type="submit"
+													class="h-10 rounded-md bg-[#7286D3] py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-[#C3ACD0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[indigo-500]"
+													onClick={retrieveOriginalUrl}
+												>
+													Retrieve original url
+												</button>
+											</Match>
+										</Switch>
 									</div>
 								</div>
 							</div>
@@ -208,7 +221,7 @@ const Home = () => {
 							leaveFrom="opacity-100 scale-100"
 							leaveTo="opacity-0 scale-95"
 						>
-							<DialogPanel class="my-8 inline-block w-full max-w-md transform overflow-hidden rounded-xl bg-gray-50 p-6 text-left align-middle shadow-xl transition-all dark:border dark:border-gray-50">
+							<DialogPanel class="my-8 inline-block w-[500px] transform overflow-hidden rounded-xl bg-gray-50 p-6 text-left align-middle shadow-xl transition-all dark:border dark:border-gray-50">
 								<DialogTitle
 									as="h3"
 									class="text-xl font-medium leading-6 text-gray-900"
@@ -219,17 +232,33 @@ const Home = () => {
 								</DialogTitle>
 								<Switch>
 									<Match when={response()?.success}>
-										<div class="mt-2 flex space-x-2">
-											<p class="text-lg font-medium">Your shrt link:</p>
-											<p class="text-lg">
-												{import.meta.env.VITE_BASE_URL +
-													'/' +
-													response()?.data.slug}
-											</p>
+										<div class="flex-col">
+											<div class="mt-2 flex">
+												<p class="text-lg font-medium">
+													Your shrt link:&nbsp
+												</p>
+												&nbsp
+												<p class="text-lg">
+													{import.meta.env.VITE_BASE_URL +
+														'/' +
+														response()?.data.slug}
+												</p>
+											</div>
+											<div class="flex justify-center">
+												<img
+													src={`https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(
+														import.meta.env.VITE_BASE_URL +
+															'/' +
+															response()?.data.slug
+													)}`}
+													alt="qr"
+													class="mt-2"
+												/>
+											</div>
 										</div>
 									</Match>
 									<Match when={!response()?.success}>
-										<div class="mt-2 flex flex-col space-x-2">
+										<div class="mt-2 flex flex-col">
 											<p class="text-lg font-medium"></p>
 											<p class="text-lg">
 												{response()?.error.detail ?? null}

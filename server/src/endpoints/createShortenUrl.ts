@@ -5,12 +5,24 @@ import { UrlRequest } from "../types/request";
 
 import { BasedResponseElysia } from "../types/response";
 import { generateSlug } from "../utils/generateSlug";
+import { isAlphanumeric } from "../utils/validation";
 
 export const createShortenUrlController = (app: Elysia) => app
     .post('/create', async ({ body: { full_url, slug }, set }) => {
         const shrtRepo = new ShrtRepository();
 
         if (slug) {
+            if (!isAlphanumeric(slug)) {
+                set.status = 400
+                return {
+                    success: false,
+                    error: {
+                        error_message: "Validation failed",
+                        detail: "The slug is invalid",
+                    }
+                }
+            }
+
             // Check duplicate link
             const check = await shrtRepo.getUrlBySlug(slug)
 

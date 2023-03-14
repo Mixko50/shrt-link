@@ -11,4 +11,14 @@ export const errorHandling = (app: Elysia) => app
                 }
             }
         }
+
+        if (code === 'INTERNAL_SERVER_ERROR') {
+            set.status = 500
+            return {
+                success: false,
+                data: {
+                    error_message: error.message,
+                }
+            }
+        }
     })
