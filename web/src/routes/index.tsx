@@ -236,7 +236,9 @@ const Home = () => {
 								>
 									{response()?.success
 										? 'Success!'
-										: response()?.error.error_message ?? 'Something went wrong'}
+										: response()?.error.error_message === undefined
+										? 'Something went wrong'
+										: response()?.error.error_message}
 								</DialogTitle>
 								<Switch>
 									<Match when={response()?.success}>
