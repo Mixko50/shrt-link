@@ -229,7 +229,7 @@ const Home = () => {
 							leaveFrom="opacity-100 scale-100"
 							leaveTo="opacity-0 scale-95"
 						>
-							<DialogPanel class="my-8 inline-block w-[500px] transform overflow-hidden rounded-xl bg-gray-50 p-6 text-left align-middle shadow-xl transition-all dark:border dark:border-gray-50">
+							<DialogPanel class="my-8 inline-block transform overflow-hidden rounded-xl bg-gray-50 p-6 text-left align-middle shadow-xl transition-all dark:border dark:border-gray-50">
 								<DialogTitle
 									as="h3"
 									class="text-xl font-medium leading-6 text-gray-900"
