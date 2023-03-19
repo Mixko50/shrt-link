@@ -18,5 +18,5 @@ const app = new Elysia()
     .use(route)
     .listen(process.env.PORT ?? 8080)
 
-console.log(`🦊 Elysia is running at http://localhost:${app.server?.port}`)
+console.log(`💧 Shrt server is running at http://localhost:${app.server?.port}`)
 
