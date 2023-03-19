@@ -46,6 +46,10 @@ const Home = () => {
 				setResponse(data);
 				openModal();
 				setIsFecthing(false);
+			})
+			.catch(() => {
+				setIsFecthing(false);
+				openModal();
 			});
 	};
 
@@ -65,6 +69,10 @@ const Home = () => {
 				setResponse(data);
 				openModal();
 				setIsFecthing(false);
+			})
+			.catch(() => {
+				setIsFecthing(false);
+				openModal();
 			});
 	};
 
@@ -228,7 +236,7 @@ const Home = () => {
 								>
 									{response()?.success
 										? 'Success!'
-										: response()?.error.error_message}
+										: response()?.error.error_message ?? 'Something went wrong'}
 								</DialogTitle>
 								<Switch>
 									<Match when={response()?.success}>
@@ -259,8 +267,10 @@ const Home = () => {
 									</Match>
 									<Match when={!response()?.success}>
 										<div class="mt-2 flex flex-col">
-											<p class="text-lg font-medium"></p>
-											<p class="text-lg">{response()?.error?.detail ?? ''}</p>
+											<p class="text-lg">
+												{response()?.error?.detail ??
+													'An error occurred while retrieving data'}
+											</p>
 										</div>
 									</Match>
 								</Switch>
