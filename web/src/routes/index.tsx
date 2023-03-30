@@ -293,16 +293,19 @@ const Home = () => {
 											>
 												Copy
 											</button>
-											<A
+											<button
 												class="h-10 w-full justify-center rounded-md bg-[#FFB26B] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto "
-												onClick={closeModal}
-												href={`${import.meta.env.VITE_BASE_URL}/${
-													response()?.data.slug ?? url()
-												}`}
-												target="_blank"
+												onClick={() => {
+													window.open(
+														`${import.meta.env.VITE_BASE_URL}/${
+															response()?.data.slug ?? url()
+														}`
+													);
+													closeModal();
+												}}
 											>
 												Open url
-											</A>
+											</button>
 										</Match>
 										<Match when={!response()?.success}>
 											<button
