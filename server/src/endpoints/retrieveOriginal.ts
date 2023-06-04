@@ -36,7 +36,7 @@ export const retrieveOriginalUrl = (app: Elysia) => app
         } else {
             set.status = 400
             return {
-                success: true,
+                success: false,
                 error: {
                     error_message: "URL Not found"
                 }
