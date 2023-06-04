@@ -248,13 +248,13 @@ const Home = () => {
 												<p class="text-lg">
 													{import.meta.env.VITE_BASE_URL +
 														'/' +
-														response()?.data.slug}
+														response()?.data?.slug}
 												</p>
 											</div>
 											<div class="mt-2 flex flex-wrap">
 												<p class="text-lg font-medium">Full Url:&nbsp;</p>
 												<p class="break-all text-lg">
-													{response()?.data.long_url ?? 'N/A'}
+													{response()?.data?.long_url ?? 'N/A'}
 												</p>
 											</div>
 											<div class="flex justify-center">
@@ -262,7 +262,7 @@ const Home = () => {
 													src={`https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(
 														import.meta.env.VITE_BASE_URL +
 															'/' +
-															response()?.data.slug
+															response()?.data?.slug
 													)}`}
 													alt="qr"
 													class="mt-2"
@@ -289,7 +289,7 @@ const Home = () => {
 												onClick={() => {
 													navigator.clipboard.writeText(
 														`${import.meta.env.VITE_BASE_URL}/${
-															response()?.data.slug
+															response()?.data?.slug
 														}`
 													);
 													closeModal();
@@ -302,7 +302,7 @@ const Home = () => {
 												onClick={() => {
 													window.open(
 														`${import.meta.env.VITE_BASE_URL}/${
-															response()?.data.slug ?? url()
+															response()?.data?.slug ?? url()
 														}`
 													);
 													closeModal();
