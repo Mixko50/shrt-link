@@ -256,9 +256,7 @@ const Home = () => {
 												<p class="text-lg font-medium">Full Url:&nbsp</p>
 												&nbsp
 												<p class="text-lg">
-													{import.meta.env.VITE_BASE_URL +
-														'/' +
-														response()?.data.long_url ?? 'N/A'}
+													{response()?.data.long_url ?? 'N/A'}
 												</p>
 											</div>
 											<div class="flex justify-center">
