@@ -241,21 +241,19 @@ const Home = () => {
 								<Switch>
 									<Match when={response()?.success}>
 										<div class="flex-col">
-											<div class="mt-2 flex">
+											<div class="mt-2 flex flex-wrap">
 												<p class="text-lg font-medium">
-													Your shrt link:&nbsp
+													Your shrt link:&nbsp;
 												</p>
-												&nbsp
 												<p class="text-lg">
 													{import.meta.env.VITE_BASE_URL +
 														'/' +
 														response()?.data.slug}
 												</p>
 											</div>
-											<div class="mt-2 flex">
-												<p class="text-lg font-medium">Full Url:&nbsp</p>
-												&nbsp
-												<p class="text-lg">
+											<div class="mt-2 flex flex-wrap">
+												<p class="text-lg font-medium">Full Url:&nbsp;</p>
+												<p class="break-all text-lg">
 													{response()?.data.long_url ?? 'N/A'}
 												</p>
 											</div>
