@@ -38,7 +38,8 @@ export const retrieveOriginalUrl = (app: Elysia) => app
             return {
                 success: false,
                 error: {
-                    error_message: "URL Not found"
+                    error_message: "URL Not found",
+                    detail: "The slug is not found",
                 }
             }
         }

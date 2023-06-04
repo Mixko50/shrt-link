@@ -31,7 +31,8 @@ export const createShortenUrlController = (app: Elysia) => app
                 return {
                     success: false,
                     data: {
-                        error_message: "Duplicate slug"
+                        error_message: "Duplicate slug",
+                        detail: "The slug is already taken"
                     }
                 }
             }
