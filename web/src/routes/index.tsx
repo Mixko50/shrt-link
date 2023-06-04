@@ -9,7 +9,6 @@ import {
 } from 'solid-headless';
 import { BasedResponse } from '~/types/response';
 import { RetrieveRequest, ShrtRequest } from '~/types/request';
-import { A } from 'solid-start';
 import LoadingIndicator from '~/components/LoadingIndicator';
 
 const Home = () => {
@@ -251,6 +250,15 @@ const Home = () => {
 													{import.meta.env.VITE_BASE_URL +
 														'/' +
 														response()?.data.slug}
+												</p>
+											</div>
+											<div class="mt-2 flex">
+												<p class="text-lg font-medium">Full Url:&nbsp</p>
+												&nbsp
+												<p class="text-lg">
+													{import.meta.env.VITE_BASE_URL +
+														'/' +
+														response()?.data.long_url ?? 'N/A'}
 												</p>
 											</div>
 											<div class="flex justify-center">
