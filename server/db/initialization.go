@@ -3,12 +3,11 @@ package db
 import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"shrt-server/types/entity"
 	"shrt-server/utilities/config"
 )
 
-var DB *gorm.DB
-
-func Init() {
+func Init() *gorm.DB {
 	db, err := gorm.Open(mysql.Open(config.C.MySqlDsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
@@ -16,11 +15,11 @@ func Init() {
 
 	if config.C.AllowAutoMigrate {
 		// Create all tables
-		err := db.AutoMigrate(Shrts{})
+		err := db.AutoMigrate(entity.Shrt{})
 		if err != nil {
 			panic(err)
 		}
 	}
 
-	DB = db
+	return db
 }

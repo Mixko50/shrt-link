@@ -1,4 +1,4 @@
-package response
+package types
 
 type CreateShortenLinkResponse struct {
 	LongUrl string `json:"long_url"`
