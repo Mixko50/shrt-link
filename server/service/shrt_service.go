@@ -89,5 +89,5 @@ func (s shrtService) GetOriginalURLToRedirect(slug string) (string, error) {
 		log.Error(err)
 	}
 
-	return shortLink.Slug, nil
+	return shortLink.LongURL, nil
 }
