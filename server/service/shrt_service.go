@@ -48,6 +48,12 @@ func (s shrtService) CreateShrtLink(body *types.CreateShortenLinkRequest) (*type
 		if !errors.Is(err, gorm.ErrRecordNotFound) && checkDuplicated != nil {
 			return nil, types.ErrSlugAlreadyExists
 		}
+
+		// other error
+		if !errors.Is(err, gorm.ErrRecordNotFound) && err != nil {
+			return nil, types.ErrCheckExistingUrl
+		}
+
 		slug = *body.Slug
 	} else {
 		slug = text.GenerateSlug()

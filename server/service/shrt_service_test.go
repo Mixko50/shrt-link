@@ -8,15 +8,16 @@ import (
 	"shrt-server/test/mocks"
 	"shrt-server/types"
 	"shrt-server/types/entity"
+	"shrt-server/utilities/text"
 	"testing"
 )
 
 func TestCreateShrtLink(t *testing.T) {
+	control := gomock.NewController(t)
+	defer control.Finish()
+
 	t.Run("create with existing url", func(t *testing.T) {
 		// Arrange
-		control := gomock.NewController(t)
-		defer control.Finish()
-
 		expected := &types.CreateShortenLinkResponse{
 			LongUrl: "https://www.google.com",
 			Slug:    "abc",
@@ -43,9 +44,6 @@ func TestCreateShrtLink(t *testing.T) {
 
 	t.Run("create with existing url and check existing url error", func(t *testing.T) {
 		// Arrange
-		control := gomock.NewController(t)
-		defer control.Finish()
-
 		shrtRepo := mocks.NewMockShrtRepository(control)
 		shrtRepo.EXPECT().FindByLongURL("https://www.google.com").Return(nil, types.ErrCheckExistingUrl)
 		shrtService := service.NewShrtService(shrtRepo)
@@ -61,9 +59,6 @@ func TestCreateShrtLink(t *testing.T) {
 
 	t.Run("create with existing url but cannot update visit", func(t *testing.T) {
 		// Arrange
-		control := gomock.NewController(t)
-		defer control.Finish()
-
 		expected := &types.CreateShortenLinkResponse{
 			LongUrl: "https://www.google.com",
 			Slug:    "abc",
@@ -94,9 +89,6 @@ func TestCreateShrtLink(t *testing.T) {
 	for _, slug := range invalidSlug {
 		t.Run("create link with invalid slug", func(t *testing.T) {
 			// Arrange
-			control := gomock.NewController(t)
-			defer control.Finish()
-
 			shrtRepo := mocks.NewMockShrtRepository(control)
 			shrtRepo.EXPECT().FindByLongURL("https://www.google.com").Return(nil, gorm.ErrRecordNotFound)
 
@@ -145,9 +137,6 @@ func TestCreateShrtLink(t *testing.T) {
 	for _, duplicatedSlug := range duplicatedSlugList {
 		t.Run("create link with duplicated slug", func(t *testing.T) {
 			// Arrange
-			control := gomock.NewController(t)
-			defer control.Finish()
-
 			shrtRepo := mocks.NewMockShrtRepository(control)
 			shrtRepo.EXPECT().FindByLongURL("https://www.google.com").Return(nil, gorm.ErrRecordNotFound)
 			shrtRepo.EXPECT().FindBySlug(duplicatedSlug.slug).Return(&entity.Shrt{
@@ -169,17 +158,113 @@ func TestCreateShrtLink(t *testing.T) {
 		})
 	}
 
-	//t.Run("create link with slug", func(t *testing.T) {
-	//
-	//})
+	t.Run("create link with slug", func(t *testing.T) {
+		// Arrange
+		data := &types.CreateShortenLinkRequest{
+			LongURL: "https://www.google.com",
+			Slug:    text.Ptr("mixko_google"),
+		}
+
+		expected := &types.CreateShortenLinkResponse{
+			LongUrl: "https://www.google.com",
+			Slug:    "mixko_google",
+		}
+
+		shrtRepo := mocks.NewMockShrtRepository(control)
+		shrtRepo.EXPECT().FindByLongURL(data.LongURL).Return(nil, gorm.ErrRecordNotFound)
+		shrtRepo.EXPECT().FindBySlug(*data.Slug).Return(nil, gorm.ErrRecordNotFound)
+		shrtRepo.EXPECT().Create(&entity.Shrt{
+			LongURL: data.LongURL,
+			Slug:    *data.Slug,
+		}).Return(nil)
+
+		shrtService := service.NewShrtService(shrtRepo)
+
+		// Act
+		createUrl, _ := shrtService.CreateShrtLink(data)
+
+		// Assert
+		assert.Equal(t, expected, createUrl)
+	})
+
+	t.Run("create link with slug and check existing slug error", func(t *testing.T) {
+		// Arrange
+		data := &types.CreateShortenLinkRequest{
+			LongURL: "https://www.google.com",
+			Slug:    text.Ptr("mixko_google"),
+		}
+
+		shrtRepo := mocks.NewMockShrtRepository(control)
+		shrtRepo.EXPECT().FindByLongURL(data.LongURL).Return(nil, gorm.ErrRecordNotFound)
+		shrtRepo.EXPECT().FindBySlug(*data.Slug).Return(nil, types.ErrCheckExistingUrl)
+
+		shrtService := service.NewShrtService(shrtRepo)
+
+		// Act
+		_, err := shrtService.CreateShrtLink(data)
+
+		// Assert
+		assert.Equal(t, types.ErrCheckExistingUrl, err)
+	})
+
+	t.Run("create link with slug and cannot create shrt link", func(t *testing.T) {
+		// Arrange
+		data := &types.CreateShortenLinkRequest{
+			LongURL: "https://www.google.com",
+			Slug:    text.Ptr("mixko_google"),
+		}
+
+		shrtRepo := mocks.NewMockShrtRepository(control)
+		shrtRepo.EXPECT().FindByLongURL(data.LongURL).Return(nil, gorm.ErrRecordNotFound)
+		shrtRepo.EXPECT().FindBySlug(*data.Slug).Return(nil, gorm.ErrRecordNotFound)
+		shrtRepo.EXPECT().Create(&entity.Shrt{
+			LongURL: data.LongURL,
+			Slug:    *data.Slug,
+		}).Return(types.ErrCannotCreateShrtLink)
+
+		shrtService := service.NewShrtService(shrtRepo)
+
+		// Act
+		_, err := shrtService.CreateShrtLink(data)
+
+		// Assert
+		assert.Equal(t, types.ErrCannotCreateShrtLink, err)
+	})
+
+	t.Run("create link without slug", func(t *testing.T) {
+		// Arrange
+		data := &types.CreateShortenLinkRequest{
+			LongURL: "https://www.google.com",
+		}
+
+		expectedLongUrl := "https://www.google.com"
+
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		shrtRepo := mocks.NewMockShrtRepository(ctrl)
+		shrtRepo.EXPECT().FindByLongURL(data.LongURL).Return(nil, gorm.ErrRecordNotFound)
+		shrtRepo.EXPECT().Create(gomock.Any()).Do(func(input *entity.Shrt) {
+			assert.NotNil(t, input.Slug) // Assert the generated slug
+		}).Return(nil)
+
+		shrtService := service.NewShrtService(shrtRepo)
+
+		// Act
+		createUrl, err := shrtService.CreateShrtLink(data)
+
+		// Assert
+		assert.Nil(t, err)
+		assert.Equal(t, expectedLongUrl, createUrl.LongUrl)
+	})
 }
 
 func TestGetOriginalUrl(t *testing.T) {
+	control := gomock.NewController(t)
+	defer control.Finish()
+
 	t.Run("get original url with existing slug", func(t *testing.T) {
 		// Arrange
-		control := gomock.NewController(t)
-		defer control.Finish()
-
 		longUrl := "https://www.google.com"
 		slug := "abcdefg"
 
@@ -206,9 +291,6 @@ func TestGetOriginalUrl(t *testing.T) {
 
 	t.Run("get original url with not existing slug", func(t *testing.T) {
 		// Arrange
-		control := gomock.NewController(t)
-		defer control.Finish()
-
 		slug := "abcdefg"
 
 		shrtRepo := mocks.NewMockShrtRepository(control)
@@ -225,11 +307,11 @@ func TestGetOriginalUrl(t *testing.T) {
 }
 
 func TestGetOriginalUrlToRedirect(t *testing.T) {
+	control := gomock.NewController(t)
+	defer control.Finish()
+
 	t.Run("get original url to redirect with existing slug", func(t *testing.T) {
 		// Arrange
-		control := gomock.NewController(t)
-		defer control.Finish()
-
 		longUrl := "https://www.google.com"
 		slug := "abcdefg"
 
@@ -252,9 +334,6 @@ func TestGetOriginalUrlToRedirect(t *testing.T) {
 
 	t.Run("get original url to redirect with not existing slug", func(t *testing.T) {
 		// Arrange
-		control := gomock.NewController(t)
-		defer control.Finish()
-
 		slug := "abcdefg"
 
 		shrtRepo := mocks.NewMockShrtRepository(control)
@@ -271,9 +350,6 @@ func TestGetOriginalUrlToRedirect(t *testing.T) {
 
 	t.Run("get original url to redirect with existing slug but cannot update visit", func(t *testing.T) {
 		// Arrange
-		control := gomock.NewController(t)
-		defer control.Finish()
-
 		longUrl := "https://www.google.com"
 		slug := "abcdefg"
 
