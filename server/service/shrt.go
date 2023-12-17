@@ -1,11 +1,12 @@
 package service
 
 import (
-	"shrt-server/types"
+	"shrt-server/types/request"
+	"shrt-server/types/response"
 )
 
 type ShrtService interface {
-	CreateShrtLink(body *types.CreateShortenLinkRequest) (*types.CreateShortenLinkResponse, error)
-	GetOriginalURL(slug string) (*types.CreateShortenLinkResponse, error)
+	CreateShrtLink(body *request.CreateShortenLinkRequest) (*response.CreateShortenLinkResponse, error)
+	GetOriginalURL(slug string) (*response.CreateShortenLinkResponse, error)
 	GetOriginalURLToRedirect(slug string) (string, error)
 }

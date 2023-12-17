@@ -8,6 +8,8 @@ import (
 	"shrt-server/test/mocks"
 	"shrt-server/types"
 	"shrt-server/types/entity"
+	"shrt-server/types/request"
+	"shrt-server/types/response"
 	"shrt-server/utilities/text"
 	"testing"
 )
@@ -16,88 +18,18 @@ func TestCreateShrtLink(t *testing.T) {
 	control := gomock.NewController(t)
 	defer control.Finish()
 
-	t.Run("create with existing url", func(t *testing.T) {
-		// Arrange
-		expected := &types.CreateShortenLinkResponse{
-			LongUrl: "https://www.google.com",
-			Slug:    "abc",
-		}
-
-		shrtRepo := mocks.NewMockShrtRepository(control)
-		shrtRepo.EXPECT().FindByLongURL("https://www.google.com").Return(&entity.Shrt{
-			ID:      1,
-			LongURL: "https://www.google.com",
-			Slug:    "abc",
-		}, nil)
-		shrtRepo.EXPECT().UpdateVisit(uint(1)).Return(nil)
-
-		shrtService := service.NewShrtService(shrtRepo)
-
-		// Act
-		createUrl, _ := shrtService.CreateShrtLink(&types.CreateShortenLinkRequest{
-			LongURL: "https://www.google.com",
-		})
-
-		// Assert
-		assert.Equal(t, expected, createUrl)
-	})
-
-	t.Run("create with existing url and check existing url error", func(t *testing.T) {
-		// Arrange
-		shrtRepo := mocks.NewMockShrtRepository(control)
-		shrtRepo.EXPECT().FindByLongURL("https://www.google.com").Return(nil, types.ErrCheckExistingUrl)
-		shrtService := service.NewShrtService(shrtRepo)
-
-		// Act
-		_, err := shrtService.CreateShrtLink(&types.CreateShortenLinkRequest{
-			LongURL: "https://www.google.com",
-		})
-
-		// Assert
-		assert.Equal(t, types.ErrCheckExistingUrl, err)
-	})
-
-	t.Run("create with existing url but cannot update visit", func(t *testing.T) {
-		// Arrange
-		expected := &types.CreateShortenLinkResponse{
-			LongUrl: "https://www.google.com",
-			Slug:    "abc",
-		}
-
-		shrtRepo := mocks.NewMockShrtRepository(control)
-		shrtRepo.EXPECT().FindByLongURL("https://www.google.com").Return(&entity.Shrt{
-			ID:      1,
-			LongURL: "https://www.google.com",
-			Slug:    "abc",
-		}, nil)
-
-		shrtRepo.EXPECT().UpdateVisit(uint(1)).Return(types.ErrCannotUpdateVisit)
-
-		shrtService := service.NewShrtService(shrtRepo)
-
-		// Act
-		createUrl, _ := shrtService.CreateShrtLink(&types.CreateShortenLinkRequest{
-			LongURL: "https://www.google.com",
-		})
-
-		// Assert
-		assert.Equal(t, expected, createUrl)
-	})
-
 	invalidSlug := []string{"abc@", "ewdf*0", "e0il243+", "&3,123d", "rtrt12312=3", "34253!45", "#@$%%G"}
 
 	for _, slug := range invalidSlug {
 		t.Run("create link with invalid slug", func(t *testing.T) {
 			// Arrange
 			shrtRepo := mocks.NewMockShrtRepository(control)
-			shrtRepo.EXPECT().FindByLongURL("https://www.google.com").Return(nil, gorm.ErrRecordNotFound)
-
 			shrtService := service.NewShrtService(shrtRepo)
 
 			// Act
-			_, err := shrtService.CreateShrtLink(&types.CreateShortenLinkRequest{
-				LongURL: "https://www.google.com",
-				Slug:    &slug, // invalid slug
+			_, err := shrtService.CreateShrtLink(&request.CreateShortenLinkRequest{
+				OriginalUrl: "https://www.google.com",
+				Slug:        &slug, // invalid slug
 			})
 
 			// Assert
@@ -138,7 +70,6 @@ func TestCreateShrtLink(t *testing.T) {
 		t.Run("create link with duplicated slug", func(t *testing.T) {
 			// Arrange
 			shrtRepo := mocks.NewMockShrtRepository(control)
-			shrtRepo.EXPECT().FindByLongURL("https://www.google.com").Return(nil, gorm.ErrRecordNotFound)
 			shrtRepo.EXPECT().FindBySlug(duplicatedSlug.slug).Return(&entity.Shrt{
 				ID:      duplicatedSlug.id,
 				LongURL: duplicatedSlug.longURL,
@@ -148,9 +79,9 @@ func TestCreateShrtLink(t *testing.T) {
 			shrtService := service.NewShrtService(shrtRepo)
 
 			// Act
-			_, err := shrtService.CreateShrtLink(&types.CreateShortenLinkRequest{
-				LongURL: "https://www.google.com",
-				Slug:    &duplicatedSlug.slug,
+			_, err := shrtService.CreateShrtLink(&request.CreateShortenLinkRequest{
+				OriginalUrl: "https://www.google.com",
+				Slug:        &duplicatedSlug.slug,
 			})
 
 			// Assert
@@ -160,21 +91,20 @@ func TestCreateShrtLink(t *testing.T) {
 
 	t.Run("create link with slug", func(t *testing.T) {
 		// Arrange
-		data := &types.CreateShortenLinkRequest{
-			LongURL: "https://www.google.com",
-			Slug:    text.Ptr("mixko_google"),
+		data := &request.CreateShortenLinkRequest{
+			OriginalUrl: "https://www.google.com",
+			Slug:        text.Ptr("mixko_google"),
 		}
 
-		expected := &types.CreateShortenLinkResponse{
-			LongUrl: "https://www.google.com",
-			Slug:    "mixko_google",
+		expected := &response.CreateShortenLinkResponse{
+			OriginalUrl: "https://www.google.com",
+			Slug:        "mixko_google",
 		}
 
 		shrtRepo := mocks.NewMockShrtRepository(control)
-		shrtRepo.EXPECT().FindByLongURL(data.LongURL).Return(nil, gorm.ErrRecordNotFound)
 		shrtRepo.EXPECT().FindBySlug(*data.Slug).Return(nil, gorm.ErrRecordNotFound)
 		shrtRepo.EXPECT().Create(&entity.Shrt{
-			LongURL: data.LongURL,
+			LongURL: data.OriginalUrl,
 			Slug:    *data.Slug,
 		}).Return(nil)
 
@@ -189,13 +119,12 @@ func TestCreateShrtLink(t *testing.T) {
 
 	t.Run("create link with slug and check existing slug error", func(t *testing.T) {
 		// Arrange
-		data := &types.CreateShortenLinkRequest{
-			LongURL: "https://www.google.com",
-			Slug:    text.Ptr("mixko_google"),
+		data := &request.CreateShortenLinkRequest{
+			OriginalUrl: "https://www.google.com",
+			Slug:        text.Ptr("mixko_google"),
 		}
 
 		shrtRepo := mocks.NewMockShrtRepository(control)
-		shrtRepo.EXPECT().FindByLongURL(data.LongURL).Return(nil, gorm.ErrRecordNotFound)
 		shrtRepo.EXPECT().FindBySlug(*data.Slug).Return(nil, types.ErrCheckExistingUrl)
 
 		shrtService := service.NewShrtService(shrtRepo)
@@ -209,16 +138,15 @@ func TestCreateShrtLink(t *testing.T) {
 
 	t.Run("create link with slug and cannot create shrt link", func(t *testing.T) {
 		// Arrange
-		data := &types.CreateShortenLinkRequest{
-			LongURL: "https://www.google.com",
-			Slug:    text.Ptr("mixko_google"),
+		data := &request.CreateShortenLinkRequest{
+			OriginalUrl: "https://www.google.com",
+			Slug:        text.Ptr("mixko_google"),
 		}
 
 		shrtRepo := mocks.NewMockShrtRepository(control)
-		shrtRepo.EXPECT().FindByLongURL(data.LongURL).Return(nil, gorm.ErrRecordNotFound)
 		shrtRepo.EXPECT().FindBySlug(*data.Slug).Return(nil, gorm.ErrRecordNotFound)
 		shrtRepo.EXPECT().Create(&entity.Shrt{
-			LongURL: data.LongURL,
+			LongURL: data.OriginalUrl,
 			Slug:    *data.Slug,
 		}).Return(types.ErrCannotCreateShrtLink)
 
@@ -233,8 +161,8 @@ func TestCreateShrtLink(t *testing.T) {
 
 	t.Run("create link without slug", func(t *testing.T) {
 		// Arrange
-		data := &types.CreateShortenLinkRequest{
-			LongURL: "https://www.google.com",
+		data := &request.CreateShortenLinkRequest{
+			OriginalUrl: "https://www.google.com",
 		}
 
 		expectedLongUrl := "https://www.google.com"
@@ -243,7 +171,6 @@ func TestCreateShrtLink(t *testing.T) {
 		defer ctrl.Finish()
 
 		shrtRepo := mocks.NewMockShrtRepository(ctrl)
-		shrtRepo.EXPECT().FindByLongURL(data.LongURL).Return(nil, gorm.ErrRecordNotFound)
 		shrtRepo.EXPECT().Create(gomock.Any()).Do(func(input *entity.Shrt) {
 			assert.NotNil(t, input.Slug) // Assert the generated slug
 		}).Return(nil)
@@ -255,7 +182,7 @@ func TestCreateShrtLink(t *testing.T) {
 
 		// Assert
 		assert.Nil(t, err)
-		assert.Equal(t, expectedLongUrl, createUrl.LongUrl)
+		assert.Equal(t, expectedLongUrl, createUrl.OriginalUrl)
 	})
 }
 
@@ -268,9 +195,9 @@ func TestGetOriginalUrl(t *testing.T) {
 		longUrl := "https://www.google.com"
 		slug := "abcdefg"
 
-		expected := &types.CreateShortenLinkResponse{
-			LongUrl: longUrl,
-			Slug:    slug,
+		expected := &response.CreateShortenLinkResponse{
+			OriginalUrl: longUrl,
+			Slug:        slug,
 		}
 
 		shrtRepo := mocks.NewMockShrtRepository(control)

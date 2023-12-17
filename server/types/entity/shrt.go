@@ -3,12 +3,12 @@ package entity
 import "time"
 
 type Shrt struct {
-	ID        uint      `json:"id" gorm:"primarykey"`
-	LongURL   string    `json:"long_url" gorm:"type:varchar(255)"`
-	Slug      string    `json:"slug" gorm:"type:varchar(255)"`
-	Visit     int       `json:"visit"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID        uint      `gorm:"primarykey"`
+	LongURL   string    `gorm:"type:varchar(255)"`
+	Slug      string    `gorm:"type:varchar(255)"`
+	Visit     int       `gorm:"visit"`
+	CreatedAt time.Time `gorm:"column:createdAt"`
+	UpdatedAt time.Time `gorm:"column:updatedAt"`
 }
 
 type Tabler interface {

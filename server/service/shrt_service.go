@@ -7,6 +7,8 @@ import (
 	"shrt-server/repository"
 	"shrt-server/types"
 	"shrt-server/types/entity"
+	"shrt-server/types/request"
+	"shrt-server/types/response"
 	"shrt-server/utilities/text"
 )
 
@@ -18,24 +20,7 @@ func NewShrtService(shrtRepository repository.ShrtRepository) shrtService {
 	return shrtService{shrtRepository: shrtRepository}
 }
 
-func (s shrtService) CreateShrtLink(body *types.CreateShortenLinkRequest) (*types.CreateShortenLinkResponse, error) {
-	shrt, err := s.shrtRepository.FindByLongURL(body.LongURL)
-	if !errors.Is(err, gorm.ErrRecordNotFound) && err != nil {
-		return nil, types.ErrCheckExistingUrl
-	}
-
-	if shrt != nil {
-		err := s.shrtRepository.UpdateVisit(shrt.ID)
-		if err != nil {
-			log.Error(types.ErrCannotUpdateVisit)
-		}
-
-		return &types.CreateShortenLinkResponse{
-			LongUrl: shrt.LongURL,
-			Slug:    shrt.Slug,
-		}, nil
-	}
-
+func (s shrtService) CreateShrtLink(body *request.CreateShortenLinkRequest) (*response.CreateShortenLinkResponse, error) {
 	var slug string
 	if body.Slug != nil {
 		// validate slug
@@ -60,27 +45,27 @@ func (s shrtService) CreateShrtLink(body *types.CreateShortenLinkRequest) (*type
 	}
 
 	if err := s.shrtRepository.Create(&entity.Shrt{
-		LongURL: body.LongURL,
+		LongURL: body.OriginalUrl,
 		Slug:    slug,
 	}); err != nil {
 		return nil, types.ErrCannotCreateShrtLink
 	}
 
-	return &types.CreateShortenLinkResponse{
-		LongUrl: body.LongURL,
-		Slug:    slug,
+	return &response.CreateShortenLinkResponse{
+		OriginalUrl: body.OriginalUrl,
+		Slug:        slug,
 	}, nil
 }
 
-func (s shrtService) GetOriginalURL(slug string) (*types.CreateShortenLinkResponse, error) {
+func (s shrtService) GetOriginalURL(slug string) (*response.CreateShortenLinkResponse, error) {
 	shortLink, err := s.shrtRepository.FindBySlug(slug)
 	if err != nil {
 		return nil, types.ErrSlugNotFound
 	}
 
-	return &types.CreateShortenLinkResponse{
-		LongUrl: shortLink.LongURL,
-		Slug:    shortLink.Slug,
+	return &response.CreateShortenLinkResponse{
+		OriginalUrl: shortLink.LongURL,
+		Slug:        shortLink.Slug,
 	}, nil
 }
 
