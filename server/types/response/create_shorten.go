@@ -1,6 +1,6 @@
 package response
 
 type CreateShortenLinkResponse struct {
-	OriginalUrl string `json:"orginal_url"`
+	OriginalUrl string `json:"original_url"`
 	Slug        string `json:"slug"`
 }
