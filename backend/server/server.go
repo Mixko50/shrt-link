@@ -14,14 +14,14 @@ type shrtServer struct {
 	config      configuration.Config
 }
 
-func NewServer(shrtHandler handler.ShrtHandler, config configuration.Config) *shrtServer {
-	return &shrtServer{
+func NewServer(shrtHandler handler.ShrtHandler, config configuration.Config) shrtServer {
+	return shrtServer{
 		shrtHandler: shrtHandler,
 		config:      config,
 	}
 }
 
-func (s *shrtServer) Initialize() {
+func (s shrtServer) Initialize() {
 	app := fiber.New(fiber.Config{
 		AppName:       "Shrt service",
 		CaseSensitive: true,
