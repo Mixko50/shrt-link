@@ -338,4 +338,20 @@ func TestGetOriginalUrlToRedirect(t *testing.T) {
 		// Assert
 		assert.Equal(t, longUrl, originalUrl)
 	})
+
+	t.Run("get original url to redirect with database error", func(t *testing.T) {
+		// Arrange
+		slug := "abcdefg"
+
+		shrtRepo := mocks.NewMockShrtRepository(control)
+		shrtRepo.EXPECT().FindBySlug(slug).Return(nil, gorm.ErrInvalidTransaction)
+
+		shrtService := service.NewShrtService(shrtRepo)
+
+		// Act
+		_, err := shrtService.GetOriginalURLToRedirect(slug)
+
+		// Assert
+		assert.Equal(t, types.ErrSomethingWentWrong, err)
+	})
 }

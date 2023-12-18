@@ -6,19 +6,21 @@ import (
 	"shrt-server/service"
 	"shrt-server/types"
 	"shrt-server/types/request"
-	"shrt-server/utilities/config"
+	"shrt-server/utilities/configuration"
 	"shrt-server/utilities/text"
 )
 
 type shrtHandler struct {
 	shrtService service.ShrtService
 	validator   *validator.Validate
+	config      *configuration.Config
 }
 
-func NewShrtHandler(shrtService service.ShrtService, validator *validator.Validate) shrtHandler {
+func NewShrtHandler(shrtService service.ShrtService, validator *validator.Validate, config *configuration.Config) shrtHandler {
 	return shrtHandler{
 		shrtService: shrtService,
 		validator:   validator,
+		config:      config,
 	}
 }
 
@@ -43,10 +45,6 @@ func (h shrtHandler) CreateShrtLink(c *fiber.Ctx) error {
 func (h shrtHandler) GetOriginalURL(c *fiber.Ctx) error {
 	slug := c.Query("slug")
 
-	if slug == "" {
-		return types.ErrorResponse(c, fiber.StatusBadRequest, text.Ptr(types.ErrSlugIsRequired.Error()))
-	}
-
 	data, err := h.shrtService.GetOriginalURL(slug)
 	if err != nil {
 		return types.ErrorResponse(c, fiber.StatusInternalServerError, text.Ptr(err.Error()))
@@ -58,13 +56,9 @@ func (h shrtHandler) GetOriginalURL(c *fiber.Ctx) error {
 func (h shrtHandler) GetOriginalURLToRedirect(c *fiber.Ctx) error {
 	slug := c.Params("slug")
 
-	if slug == "" {
-		return c.Redirect(config.C.BaseUrl, fiber.StatusMovedPermanently)
-	}
-
 	data, err := h.shrtService.GetOriginalURLToRedirect(slug)
 	if err != nil {
-		return c.Redirect(config.C.BaseUrl, fiber.StatusMovedPermanently)
+		return c.Redirect(h.config.BaseUrl, fiber.StatusMovedPermanently)
 	}
 
 	return c.Redirect(data, fiber.StatusMovedPermanently)

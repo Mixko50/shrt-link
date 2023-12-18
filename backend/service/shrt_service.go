@@ -75,8 +75,12 @@ func (s shrtService) GetOriginalURL(slug string) (*response.CreateShortenLinkRes
 
 func (s shrtService) GetOriginalURLToRedirect(slug string) (string, error) {
 	shortLink, err := s.shrtRepository.FindBySlug(slug)
-	if err != nil {
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		return "", types.ErrSlugNotFound
+	}
+
+	if err != nil {
+		return "", types.ErrSomethingWentWrong
 	}
 
 	err = s.shrtRepository.UpdateVisit(shortLink.ID)

@@ -1,4 +1,4 @@
-package config
+package configuration
 
 import (
 	"fmt"
@@ -6,18 +6,21 @@ import (
 	"io/ioutil"
 )
 
-var C = new(config)
+func InitConfig() Config {
+	C := &Config{}
 
-func InitConfig() {
 	// Load YAML configuration
-	fmt.Println("Loading configuration from config.yaml")
+	fmt.Println("Loading configuration from configuration.yaml")
 	yml, err := ioutil.ReadFile("config.yaml")
 
 	if err != nil {
+		fmt.Println(err)
 		panic("Unable to read configuration file")
 	}
 	err = yaml.Unmarshal(yml, C)
 	if err != nil {
 		panic("Unable to read configuration file")
 	}
+
+	return *C
 }

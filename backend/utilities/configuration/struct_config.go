@@ -1,6 +1,6 @@
-package config
+package configuration
 
-type config struct {
+type Config struct {
 	BaseUrl          string `yaml:"base_url"`
 	ServerPort       string `yaml:"server_port"`
 	MySqlDsn         string `yaml:"mysql_dsn"`
