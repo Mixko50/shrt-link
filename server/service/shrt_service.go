@@ -59,8 +59,12 @@ func (s shrtService) CreateShrtLink(body *request.CreateShortenLinkRequest) (*re
 
 func (s shrtService) GetOriginalURL(slug string) (*response.CreateShortenLinkResponse, error) {
 	shortLink, err := s.shrtRepository.FindBySlug(slug)
-	if err != nil {
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, types.ErrSlugNotFound
+	}
+
+	if err != nil {
+		return nil, types.ErrSomethingWentWrong
 	}
 
 	return &response.CreateShortenLinkResponse{

@@ -231,6 +231,48 @@ func TestGetOriginalUrl(t *testing.T) {
 		// Assert
 		assert.Equal(t, types.ErrSlugNotFound, err)
 	})
+
+	t.Run("get original url with existing slug but cannot update visit", func(t *testing.T) {
+		// Arrange
+		longUrl := "https://www.google.com"
+		slug := "abcdefg"
+
+		expected := &response.CreateShortenLinkResponse{
+			OriginalUrl: longUrl,
+			Slug:        slug,
+		}
+
+		shrtRepo := mocks.NewMockShrtRepository(control)
+		shrtRepo.EXPECT().FindBySlug(slug).Return(&entity.Shrt{
+			ID:      1,
+			LongURL: longUrl,
+			Slug:    slug,
+		}, nil)
+
+		shrtService := service.NewShrtService(shrtRepo)
+
+		// Act
+		originalUrl, _ := shrtService.GetOriginalURL(slug)
+
+		// Assert
+		assert.Equal(t, expected, originalUrl)
+	})
+
+	t.Run("get original url with database error", func(t *testing.T) {
+		// Arrange
+		slug := "abcdefg"
+
+		shrtRepo := mocks.NewMockShrtRepository(control)
+		shrtRepo.EXPECT().FindBySlug(slug).Return(nil, gorm.ErrInvalidTransaction)
+
+		shrtService := service.NewShrtService(shrtRepo)
+
+		// Act
+		_, err := shrtService.GetOriginalURL(slug)
+
+		// Assert
+		assert.Equal(t, types.ErrSomethingWentWrong, err)
+	})
 }
 
 func TestGetOriginalUrlToRedirect(t *testing.T) {

@@ -44,12 +44,12 @@ func (h shrtHandler) GetOriginalURL(c *fiber.Ctx) error {
 	slug := c.Query("slug")
 
 	if slug == "" {
-		return types.ErrorResponse(c, fiber.StatusBadRequest, text.Ptr(types.ErrSomethingWentWrong.Error()))
+		return types.ErrorResponse(c, fiber.StatusBadRequest, text.Ptr(types.ErrSlugIsRequired.Error()))
 	}
 
 	data, err := h.shrtService.GetOriginalURL(slug)
 	if err != nil {
-		return types.ErrorResponse(c, fiber.StatusInternalServerError, text.Ptr(types.ErrSomethingWentWrong.Error()))
+		return types.ErrorResponse(c, fiber.StatusInternalServerError, text.Ptr(err.Error()))
 	}
 
 	return types.SuccessResponse(c, data)

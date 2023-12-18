@@ -10,4 +10,5 @@ var (
 	ErrSlugNotAlphanumeric  = errors.New("slug must be alphanumeric")
 	ErrCannotUpdateVisit    = errors.New("unable to update visit")
 	ErrSomethingWentWrong   = errors.New("something went wrong while processing your request")
+	ErrSlugIsRequired       = errors.New("slug is required")
 )
