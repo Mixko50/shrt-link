@@ -4,7 +4,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"shrt-server/types/entity"
-	"shrt-server/utilities/configuration"
+	"shrt-server/utility/configuration"
 )
 
 func Init(config configuration.Config) *gorm.DB {

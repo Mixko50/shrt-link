@@ -10,7 +10,8 @@ import (
 	"shrt-server/types/entity"
 	"shrt-server/types/request"
 	"shrt-server/types/response"
-	"shrt-server/utilities/text"
+	"shrt-server/utility"
+	"shrt-server/utility/text"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func TestCreateShrtLink(t *testing.T) {
 		t.Run("create link with invalid slug", func(t *testing.T) {
 			// Arrange
 			shrtRepo := mocks.NewMockShrtRepository(control)
-			shrtService := service.NewShrtService(shrtRepo)
+			shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 			// Act
 			_, err := shrtService.CreateShrtLink(&request.CreateShortenLinkRequest{
@@ -76,7 +77,7 @@ func TestCreateShrtLink(t *testing.T) {
 				Slug:    duplicatedSlug.slug,
 			}, nil)
 
-			shrtService := service.NewShrtService(shrtRepo)
+			shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 			// Act
 			_, err := shrtService.CreateShrtLink(&request.CreateShortenLinkRequest{
@@ -108,7 +109,7 @@ func TestCreateShrtLink(t *testing.T) {
 			Slug:    *data.Slug,
 		}).Return(nil)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		createUrl, _ := shrtService.CreateShrtLink(data)
@@ -127,7 +128,7 @@ func TestCreateShrtLink(t *testing.T) {
 		shrtRepo := mocks.NewMockShrtRepository(control)
 		shrtRepo.EXPECT().FindBySlug(*data.Slug).Return(nil, types.ErrCheckExistingUrl)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		_, err := shrtService.CreateShrtLink(data)
@@ -150,7 +151,7 @@ func TestCreateShrtLink(t *testing.T) {
 			Slug:    *data.Slug,
 		}).Return(types.ErrCannotCreateShrtLink)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		_, err := shrtService.CreateShrtLink(data)
@@ -175,7 +176,7 @@ func TestCreateShrtLink(t *testing.T) {
 			assert.NotNil(t, input.Slug) // Assert the generated slug
 		}).Return(nil)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		createUrl, err := shrtService.CreateShrtLink(data)
@@ -207,7 +208,7 @@ func TestGetOriginalUrl(t *testing.T) {
 			Slug:    slug,
 		}, nil)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		originalUrl, _ := shrtService.GetOriginalURL(slug)
@@ -223,7 +224,7 @@ func TestGetOriginalUrl(t *testing.T) {
 		shrtRepo := mocks.NewMockShrtRepository(control)
 		shrtRepo.EXPECT().FindBySlug(slug).Return(nil, gorm.ErrRecordNotFound)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		_, err := shrtService.GetOriginalURL(slug)
@@ -249,7 +250,7 @@ func TestGetOriginalUrl(t *testing.T) {
 			Slug:    slug,
 		}, nil)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		originalUrl, _ := shrtService.GetOriginalURL(slug)
@@ -265,7 +266,7 @@ func TestGetOriginalUrl(t *testing.T) {
 		shrtRepo := mocks.NewMockShrtRepository(control)
 		shrtRepo.EXPECT().FindBySlug(slug).Return(nil, gorm.ErrInvalidTransaction)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		_, err := shrtService.GetOriginalURL(slug)
@@ -292,7 +293,7 @@ func TestGetOriginalUrlToRedirect(t *testing.T) {
 		}, nil)
 		shrtRepo.EXPECT().UpdateVisit(uint(1)).Return(nil)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		originalUrl, _ := shrtService.GetOriginalURLToRedirect(slug)
@@ -308,7 +309,7 @@ func TestGetOriginalUrlToRedirect(t *testing.T) {
 		shrtRepo := mocks.NewMockShrtRepository(control)
 		shrtRepo.EXPECT().FindBySlug(slug).Return(nil, gorm.ErrRecordNotFound)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		_, err := shrtService.GetOriginalURLToRedirect(slug)
@@ -330,7 +331,7 @@ func TestGetOriginalUrlToRedirect(t *testing.T) {
 		}, nil)
 		shrtRepo.EXPECT().UpdateVisit(uint(1)).Return(types.ErrCannotUpdateVisit)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		originalUrl, _ := shrtService.GetOriginalURLToRedirect(slug)
@@ -346,7 +347,7 @@ func TestGetOriginalUrlToRedirect(t *testing.T) {
 		shrtRepo := mocks.NewMockShrtRepository(control)
 		shrtRepo.EXPECT().FindBySlug(slug).Return(nil, gorm.ErrInvalidTransaction)
 
-		shrtService := service.NewShrtService(shrtRepo)
+		shrtService := service.NewShrtService(shrtRepo, utility.NewUtility())
 
 		// Act
 		_, err := shrtService.GetOriginalURLToRedirect(slug)

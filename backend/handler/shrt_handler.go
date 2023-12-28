@@ -6,8 +6,8 @@ import (
 	"shrt-server/service"
 	"shrt-server/types"
 	"shrt-server/types/request"
-	"shrt-server/utilities/configuration"
-	"shrt-server/utilities/text"
+	"shrt-server/utility/configuration"
+	text2 "shrt-server/utility/text"
 )
 
 type shrtHandler struct {
@@ -27,16 +27,16 @@ func NewShrtHandler(shrtService service.ShrtService, validator *validator.Valida
 func (h shrtHandler) CreateShrtLink(c *fiber.Ctx) error {
 	body := new(request.CreateShortenLinkRequest)
 	if err := c.BodyParser(body); err != nil {
-		return text.FormatBodyParserErrorResponse(err, c)
+		return text2.FormatBodyParserErrorResponse(err, c)
 	}
 
 	if validateErr := h.validator.Struct(*body); validateErr != nil {
-		return text.FormatValidatorErrorResponse(c, validateErr)
+		return text2.FormatValidatorErrorResponse(c, validateErr)
 	}
 
 	data, err := h.shrtService.CreateShrtLink(body)
 	if err != nil {
-		return types.ErrorResponse(c, fiber.StatusInternalServerError, text.Ptr(err.Error()))
+		return types.ErrorResponse(c, fiber.StatusInternalServerError, text2.Ptr(err.Error()))
 	}
 
 	return types.SuccessResponse(c, data)
@@ -47,7 +47,7 @@ func (h shrtHandler) GetOriginalURL(c *fiber.Ctx) error {
 
 	data, err := h.shrtService.GetOriginalURL(slug)
 	if err != nil {
-		return types.ErrorResponse(c, fiber.StatusInternalServerError, text.Ptr(err.Error()))
+		return types.ErrorResponse(c, fiber.StatusInternalServerError, text2.Ptr(err.Error()))
 	}
 
 	return types.SuccessResponse(c, data)

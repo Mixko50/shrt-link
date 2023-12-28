@@ -7,16 +7,18 @@ import (
 	"shrt-server/repository"
 	"shrt-server/server"
 	"shrt-server/service"
-	"shrt-server/utilities/configuration"
+	"shrt-server/utility"
+	"shrt-server/utility/configuration"
 )
 
 func main() {
 	config := configuration.InitConfig()
 	database := db.Init(config)
+	utilityText := utility.NewUtility()
 	payloadValidator := validator.New()
 
 	shrtRepository := repository.NewShrtRepository(database)
-	shrtService := service.NewShrtService(shrtRepository)
+	shrtService := service.NewShrtService(shrtRepository, utilityText)
 	shrtRoute := handler.NewShrtHandler(shrtService, payloadValidator, &config)
 
 	shrtServer := server.NewServer(shrtRoute, config)

@@ -9,15 +9,20 @@ import (
 	"shrt-server/types/entity"
 	"shrt-server/types/request"
 	"shrt-server/types/response"
-	"shrt-server/utilities/text"
+	"shrt-server/utility"
+	"shrt-server/utility/text"
 )
 
 type shrtService struct {
 	shrtRepository repository.ShrtRepository
+	utility        utility.Utility
 }
 
-func NewShrtService(shrtRepository repository.ShrtRepository) shrtService {
-	return shrtService{shrtRepository: shrtRepository}
+func NewShrtService(shrtRepository repository.ShrtRepository, utlity utility.Utility) shrtService {
+	return shrtService{
+		shrtRepository: shrtRepository,
+		utility:        utlity,
+	}
 }
 
 func (s shrtService) CreateShrtLink(body *request.CreateShortenLinkRequest) (*response.CreateShortenLinkResponse, error) {
@@ -41,7 +46,7 @@ func (s shrtService) CreateShrtLink(body *request.CreateShortenLinkRequest) (*re
 
 		slug = *body.Slug
 	} else {
-		slug = text.GenerateSlug()
+		slug = s.utility.GenerateSlug()
 	}
 
 	if err := s.shrtRepository.Create(&entity.Shrt{

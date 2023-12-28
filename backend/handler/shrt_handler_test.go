@@ -14,8 +14,8 @@ import (
 	"shrt-server/types"
 	"shrt-server/types/request"
 	"shrt-server/types/response"
-	config2 "shrt-server/utilities/configuration"
-	"shrt-server/utilities/text"
+	config2 "shrt-server/utility/configuration"
+	"shrt-server/utility/text"
 	"testing"
 )
 

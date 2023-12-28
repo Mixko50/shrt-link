@@ -6,8 +6,12 @@ import (
 	recover2 "github.com/gofiber/fiber/v2/middleware/recover"
 	"shrt-server/handler"
 	"shrt-server/pkg/middleware"
-	"shrt-server/utilities/configuration"
+	"shrt-server/utility/configuration"
 )
+
+type ShrtServer interface {
+	Initialize()
+}
 
 type shrtServer struct {
 	shrtHandler handler.ShrtHandler

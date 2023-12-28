@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
 	"shrt-server/types"
-	"shrt-server/utilities/text"
+	"shrt-server/utility/text"
 )
 
 func PathNotFoundError(c *fiber.Ctx) error {
