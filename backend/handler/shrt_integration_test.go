@@ -166,7 +166,7 @@ func TestCreateShrtLinkIntegration(t *testing.T) {
 
 		expected := types.Response[response.CreateShortenLinkResponse]{
 			Success: false,
-			Message: text.Ptr("OriginalUrl should be url"),
+			Message: text.Ptr("OriginalUrl is invalid"),
 		}
 
 		var buf bytes.Buffer

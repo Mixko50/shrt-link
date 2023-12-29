@@ -31,7 +31,7 @@ const Home = () => {
 	const createShortUrl = async () => {
 		setIsFecthing(true);
 		const req: ShrtRequest = {
-			full_url: url(),
+			original_url: url(),
 			slug: slug()
 		};
 		const requestOptions = {
@@ -39,7 +39,7 @@ const Home = () => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(req)
 		};
-		fetch(import.meta.env.VITE_BASE_URL + '/api/create', requestOptions)
+		fetch(import.meta.env.VITE_BASE_URL + '/api/v1/create', requestOptions)
 			.then((response) => response.json())
 			.then((data) => {
 				setResponse(data);
@@ -62,7 +62,7 @@ const Home = () => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(req)
 		};
-		fetch(import.meta.env.VITE_BASE_URL + '/api/retrieve', requestOptions)
+		fetch(import.meta.env.VITE_BASE_URL + '/api/v1/retrieve', requestOptions)
 			.then((response) => response.json())
 			.then((data) => {
 				setResponse(data);
@@ -233,10 +233,7 @@ const Home = () => {
 									as="h3"
 									class="text-xl font-medium leading-6 text-gray-900"
 								>
-									{response()?.success
-										? 'Success!'
-										: response()?.error?.error_message ??
-										  'Something went wrong'}
+									{response()?.success ? 'Success!' : 'Error!'}
 								</DialogTitle>
 								<Switch>
 									<Match when={response()?.success}>
@@ -248,13 +245,13 @@ const Home = () => {
 												<p class="text-lg">
 													{import.meta.env.VITE_BASE_URL +
 														'/' +
-														response()?.data?.slug}
+														response()?.payload?.slug}
 												</p>
 											</div>
 											<div class="mt-2 flex flex-wrap">
 												<p class="text-lg font-medium">Full Url:&nbsp;</p>
 												<p class="break-all text-lg">
-													{response()?.data?.long_url ?? 'N/A'}
+													{response()?.payload?.original_url ?? 'N/A'}
 												</p>
 											</div>
 											<div class="flex justify-center">
@@ -262,7 +259,7 @@ const Home = () => {
 													src={`https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(
 														import.meta.env.VITE_BASE_URL +
 															'/' +
-															response()?.data?.slug
+															response()?.payload?.slug
 													)}`}
 													alt="qr"
 													class="mt-2"
@@ -273,8 +270,7 @@ const Home = () => {
 									<Match when={!response()?.success}>
 										<div class="mt-2 flex flex-col">
 											<p class="text-lg">
-												{response()?.error?.detail ??
-													'An error occurred while retrieving data'}
+												{response()?.message ?? 'An error occurred while retrieving data'}
 											</p>
 										</div>
 									</Match>
@@ -289,7 +285,7 @@ const Home = () => {
 												onClick={() => {
 													navigator.clipboard.writeText(
 														`${import.meta.env.VITE_BASE_URL}/${
-															response()?.data?.slug
+															response()?.payload?.slug
 														}`
 													);
 													closeModal();
@@ -302,7 +298,7 @@ const Home = () => {
 												onClick={() => {
 													window.open(
 														`${import.meta.env.VITE_BASE_URL}/${
-															response()?.data?.slug ?? url()
+															response()?.payload?.slug ?? url()
 														}`
 													);
 													closeModal();

@@ -1,5 +1,5 @@
 export interface ShrtRequest {
-	full_url: string;
+	original_url: string;
 	slug?: string;
 }
 

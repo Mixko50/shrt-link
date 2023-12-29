@@ -100,7 +100,7 @@ func Test_shrtHandler_CreateShrtLink(t *testing.T) {
 			},
 			expected: types.Response[response.CreateShortenLinkResponse]{
 				Success: false,
-				Message: text.Ptr("OriginalUrl should be url"),
+				Message: text.Ptr("OriginalUrl is invalid"),
 			},
 		},
 		{

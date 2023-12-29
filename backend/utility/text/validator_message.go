@@ -14,7 +14,7 @@ func FormatValidatorErrorResponse(c *fiber.Ctx, err error) error {
 	errors.As(err, &validateError)
 	if validateError[0].Tag() != "required" {
 		log.Error(validateError[0].Error())
-		return types.ErrorResponse(c, fiber.StatusBadRequest, Ptr(validateError[0].Field()+" should be "+validateError[0].Tag()))
+		return types.ErrorResponse(c, fiber.StatusBadRequest, Ptr(validateError[0].Field()+" is invalid"))
 	}
 	log.Error(strings.ToLower(validateError[0].Error()))
 	return types.ErrorResponse(c, fiber.StatusBadRequest, Ptr(validateError[0].Field()+" is required"))
