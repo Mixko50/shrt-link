@@ -23,3 +23,6 @@ build
 
 # Config file
 config.yaml
+
+# Build file
+tmp
