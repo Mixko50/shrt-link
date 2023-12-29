@@ -45,6 +45,10 @@ func (h shrtHandler) CreateShrtLink(c *fiber.Ctx) error {
 func (h shrtHandler) GetOriginalURL(c *fiber.Ctx) error {
 	slug := c.Query("slug")
 
+	if slug == "" {
+		return types.ErrorResponse(c, fiber.StatusBadRequest, text2.Ptr(types.ErrSlugIsRequired.Error()))
+	}
+
 	data, err := h.shrtService.GetOriginalURL(slug)
 	if err != nil {
 		return types.ErrorResponse(c, fiber.StatusInternalServerError, text2.Ptr(err.Error()))

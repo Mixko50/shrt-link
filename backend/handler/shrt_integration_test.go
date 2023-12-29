@@ -311,6 +311,28 @@ func TestGetOriginalURLIntegration(t *testing.T) {
 		_ = json.Unmarshal(body, &actual)
 		assert.Equal(t, expected, actual)
 	})
+
+	t.Run("get original url with empty slug", func(t *testing.T) {
+		// Arrange
+		app.Get("/api/v1/retrieve", shrtHandlerTest.GetOriginalURL)
+
+		expected := types.Response[response.CreateShortenLinkResponse]{
+			Success: false,
+			Message: text.Ptr("slug is required"),
+		}
+
+		req := httptest.NewRequest("GET", "/api/v1/retrieve", nil)
+
+		// Act
+		res, _ := app.Test(req)
+		defer res.Body.Close()
+
+		// Assert
+		body, _ := io.ReadAll(res.Body)
+		var actual types.Response[response.CreateShortenLinkResponse]
+		_ = json.Unmarshal(body, &actual)
+		assert.Equal(t, expected, actual)
+	})
 }
 
 func TestGetOriginalURLToRedirectIntegration(t *testing.T) {

@@ -8,7 +8,7 @@ import {
 	DialogOverlay
 } from 'solid-headless';
 import { BasedResponse } from '~/types/response';
-import { RetrieveRequest, ShrtRequest } from '~/types/request';
+import { ShrtRequest } from '~/types/request';
 import LoadingIndicator from '~/components/LoadingIndicator';
 
 const Home = () => {
@@ -32,7 +32,7 @@ const Home = () => {
 		setIsFecthing(true);
 		const req: ShrtRequest = {
 			original_url: url(),
-			slug: slug()
+			slug: slug().length > 0 ? slug() : undefined
 		};
 		const requestOptions = {
 			method: 'POST',
@@ -54,15 +54,14 @@ const Home = () => {
 
 	const retrieveOriginalUrl = () => {
 		setIsFecthing(true);
-		const req: RetrieveRequest = {
-			shrt_url: url()
-		};
+		const el = document.createElement('a');
+		el.href = url();
+		const path = el.pathname.split('/');
 		const requestOptions = {
-			method: 'POST',
+			method: 'GET',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(req)
 		};
-		fetch(import.meta.env.VITE_BASE_URL + '/api/v1/retrieve', requestOptions)
+		fetch(import.meta.env.VITE_BASE_URL + '/api/v1/retrieve?slug=' + path[1], requestOptions)
 			.then((response) => response.json())
 			.then((data) => {
 				setResponse(data);
@@ -240,19 +239,23 @@ const Home = () => {
 										<div class="flex-col">
 											<div class="mt-2 flex flex-wrap">
 												<p class="text-lg font-medium">
-													Your shrt link:&nbsp;
+													Your short link:&nbsp;
 												</p>
-												<p class="text-lg">
-													{import.meta.env.VITE_BASE_URL +
-														'/' +
-														response()?.payload?.slug}
-												</p>
+												<a href={import.meta.env.VITE_BASE_URL + '/' + response()?.payload?.slug} target={'_blank'}>
+													<p class="break-all text-lg">
+														{import.meta.env.VITE_BASE_URL +
+															'/' +
+															response()?.payload?.slug}
+													</p>
+												</a>
 											</div>
 											<div class="mt-2 flex flex-wrap">
 												<p class="text-lg font-medium">Full Url:&nbsp;</p>
-												<p class="break-all text-lg">
-													{response()?.payload?.original_url ?? 'N/A'}
-												</p>
+												<a href={response()?.payload?.original_url} target={'_blank'}>
+													<p class="break-all text-lg">
+														{response()?.payload?.original_url}
+													</p>
+												</a>
 											</div>
 											<div class="flex justify-center">
 												<img

@@ -3,6 +3,7 @@ package handler_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
@@ -268,6 +269,14 @@ func Test_shrtHandler_GetOriginalURL(t *testing.T) {
 				Message: text.Ptr(types.ErrSomethingWentWrong.Error()),
 			},
 		},
+		{
+			name:  "get original url with empty slug",
+			query: "",
+			expected: types.Response[response.CreateShortenLinkResponse]{
+				Success: false,
+				Message: text.Ptr(types.ErrSlugIsRequired.Error()),
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -323,6 +332,11 @@ func Test_shrtHandler_GetOriginalURLToRedirect(t *testing.T) {
 			slug:     "mixko",
 			expected: "https://m.mixkomii.com",
 		},
+		{
+			name:     "get original url to redirect with empty slug",
+			slug:     "",
+			expected: "https://m.mixkomii.com",
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -337,6 +351,7 @@ func Test_shrtHandler_GetOriginalURLToRedirect(t *testing.T) {
 			defer res.Body.Close()
 
 			// Assert http redirect
+			fmt.Println(res.Header)
 			assert.Equal(t, testCase.expected, res.Header.Get("Location"))
 		})
 	}
