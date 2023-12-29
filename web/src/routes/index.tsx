@@ -8,7 +8,7 @@ import {
 	DialogOverlay
 } from 'solid-headless';
 import { BasedResponse } from '~/types/response';
-import { RetrieveRequest, ShrtRequest } from '~/types/request';
+import { ShrtRequest } from '~/types/request';
 import LoadingIndicator from '~/components/LoadingIndicator';
 
 const Home = () => {
@@ -31,15 +31,15 @@ const Home = () => {
 	const createShortUrl = async () => {
 		setIsFecthing(true);
 		const req: ShrtRequest = {
-			full_url: url(),
-			slug: slug()
+			original_url: url(),
+			slug: slug().length > 0 ? slug() : undefined
 		};
 		const requestOptions = {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(req)
 		};
-		fetch(import.meta.env.VITE_BASE_URL + '/api/create', requestOptions)
+		fetch(import.meta.env.VITE_BASE_URL + '/api/v1/create', requestOptions)
 			.then((response) => response.json())
 			.then((data) => {
 				setResponse(data);
@@ -54,15 +54,14 @@ const Home = () => {
 
 	const retrieveOriginalUrl = () => {
 		setIsFecthing(true);
-		const req: RetrieveRequest = {
-			shrt_url: url()
-		};
+		const el = document.createElement('a');
+		el.href = url();
+		const path = el.pathname.split('/');
 		const requestOptions = {
-			method: 'POST',
+			method: 'GET',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(req)
 		};
-		fetch(import.meta.env.VITE_BASE_URL + '/api/retrieve', requestOptions)
+		fetch(import.meta.env.VITE_BASE_URL + '/api/v1/retrieve?slug=' + path[1], requestOptions)
 			.then((response) => response.json())
 			.then((data) => {
 				setResponse(data);
@@ -233,36 +232,37 @@ const Home = () => {
 									as="h3"
 									class="text-xl font-medium leading-6 text-gray-900"
 								>
-									{response()?.success
-										? 'Success!'
-										: response()?.error?.error_message ??
-										  'Something went wrong'}
+									{response()?.success ? 'Success!' : 'Error!'}
 								</DialogTitle>
 								<Switch>
 									<Match when={response()?.success}>
 										<div class="flex-col">
 											<div class="mt-2 flex flex-wrap">
 												<p class="text-lg font-medium">
-													Your shrt link:&nbsp;
+													Your short link:&nbsp;
 												</p>
-												<p class="text-lg">
-													{import.meta.env.VITE_BASE_URL +
-														'/' +
-														response()?.data?.slug}
-												</p>
+												<a href={import.meta.env.VITE_BASE_URL + '/' + response()?.payload?.slug} target={'_blank'}>
+													<p class="break-all text-lg">
+														{import.meta.env.VITE_BASE_URL +
+															'/' +
+															response()?.payload?.slug}
+													</p>
+												</a>
 											</div>
 											<div class="mt-2 flex flex-wrap">
 												<p class="text-lg font-medium">Full Url:&nbsp;</p>
-												<p class="break-all text-lg">
-													{response()?.data?.long_url ?? 'N/A'}
-												</p>
+												<a href={response()?.payload?.original_url} target={'_blank'}>
+													<p class="break-all text-lg">
+														{response()?.payload?.original_url}
+													</p>
+												</a>
 											</div>
 											<div class="flex justify-center">
 												<img
 													src={`https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(
 														import.meta.env.VITE_BASE_URL +
 															'/' +
-															response()?.data?.slug
+															response()?.payload?.slug
 													)}`}
 													alt="qr"
 													class="mt-2"
@@ -273,8 +273,7 @@ const Home = () => {
 									<Match when={!response()?.success}>
 										<div class="mt-2 flex flex-col">
 											<p class="text-lg">
-												{response()?.error?.detail ??
-													'An error occurred while retrieving data'}
+												{response()?.message ?? 'An error occurred while retrieving data'}
 											</p>
 										</div>
 									</Match>
@@ -289,7 +288,7 @@ const Home = () => {
 												onClick={() => {
 													navigator.clipboard.writeText(
 														`${import.meta.env.VITE_BASE_URL}/${
-															response()?.data?.slug
+															response()?.payload?.slug
 														}`
 													);
 													closeModal();
@@ -302,7 +301,7 @@ const Home = () => {
 												onClick={() => {
 													window.open(
 														`${import.meta.env.VITE_BASE_URL}/${
-															response()?.data?.slug ?? url()
+															response()?.payload?.slug ?? url()
 														}`
 													);
 													closeModal();
