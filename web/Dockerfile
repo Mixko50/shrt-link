@@ -9,7 +9,7 @@ WORKDIR /app
 
 RUN pnpm install
 
-CMD ["pnpm", "build"]
+RUN pnpm build
 
 FROM node:20-slim AS production
 WORKDIR /app
