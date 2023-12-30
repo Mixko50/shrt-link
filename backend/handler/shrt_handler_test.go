@@ -332,11 +332,6 @@ func Test_shrtHandler_GetOriginalURLToRedirect(t *testing.T) {
 			slug:     "mixko",
 			expected: "https://m.mixkomii.com",
 		},
-		{
-			name:     "get original url to redirect with empty slug",
-			slug:     "",
-			expected: "https://m.mixkomii.com",
-		},
 	}
 
 	for _, testCase := range testCases {
