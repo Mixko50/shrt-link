@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 	"shrt-server/types/entity"
 	"shrt-server/utility/configuration"
+	"time"
 )
 
 func Init(config configuration.Config) *gorm.DB {
@@ -12,6 +13,15 @@ func Init(config configuration.Config) *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(17000)
+	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	if config.AllowAutoMigrate {
 		// Create all tables
